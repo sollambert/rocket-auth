@@ -1,0 +1,11 @@
+[package]
+name = "rocket-auth"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket = "0.4.11"
+rocket_auth = { version = "0.4.0", features = ["tokio-postgres"] }
+rocket_codegen = "0.4.11"
