@@ -1,11 +1,15 @@
 [package]
-name = "rocket-auth"
+name = "rocket_auth_demo"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "server"
+name = "rocket_auth_demo"
 path = "server/main.rs"
+
+[lib]
+name = "rocket_auth_demo"
+path = "server/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

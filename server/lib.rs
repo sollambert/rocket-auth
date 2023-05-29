@@ -1,6 +1,6 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #![allow(unused_attributes)]
-
+use rocket::routes;
 use rocket_contrib::{serve::StaticFiles, helmet::SpaceHelmet};
 
 //List all modules to import

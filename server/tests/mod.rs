@@ -1,8 +1,10 @@
+#[cfg(test)]
 mod test {
-    use crate::lib::rocket_builder;
     use rocket::local::Client;
     use rocket::http::Status;
-
+    
+    use crate::rocket_builder;
+    
     #[test]
     fn echo_test() {
         let client = Client::new(rocket_builder()).expect("Valid Rocket instance");

@@ -1,5 +1,6 @@
 
 use rocket::{
+    get,
     response::NamedFile
 };
 use std::path::{Path, PathBuf};
