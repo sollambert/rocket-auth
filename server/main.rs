@@ -3,9 +3,12 @@
 use std::path::{Path, PathBuf};
 use std::io::Error;
 
-use rocket::{response::NamedFile};
-use rocket_contrib::serve::StaticFiles;
-use rocket_contrib::helmet::SpaceHelmet;
+use rocket::{
+    response::NamedFile
+};
+use rocket_contrib::{serve::StaticFiles, helmet::SpaceHelmet};
+
+mod modules;
 
 #[macro_use] extern crate rocket;
 
