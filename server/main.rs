@@ -24,10 +24,13 @@ fn image_server<'a>(image: PathBuf) -> Result<NamedFile, Error> {
     NamedFile::open(Path::new("public/images").join(image))
 }
 
-fn main() { 
+fn main() {
+    rocket().launch();
+}
+
+fn rocket() -> rocket::Rocket {
     rocket::ignite()
     .attach(SpaceHelmet::default())
     .mount("/", routes![index, echo, image_server])
     .mount("/images", StaticFiles::from("public/images/"))
-    .launch();
 }
