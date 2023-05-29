@@ -4,6 +4,8 @@ use std::path::{Path, PathBuf};
 use std::io::Error;
 
 use rocket::{response::NamedFile};
+use rocket_contrib::serve::StaticFiles;
+use rocket_contrib::helmet::SpaceHelmet;
 
 #[macro_use] extern crate rocket;
 
@@ -23,5 +25,9 @@ fn image_server<'a>(image: PathBuf) -> Result<NamedFile, Error> {
 }
 
 fn main() { 
-    rocket::ignite().mount("/", routes![index, echo, image_server]).launch();
+    rocket::ignite()
+    .attach(SpaceHelmet::default())
+    .mount("/", routes![index, echo, image_server])
+    .mount("/images", StaticFiles::from("public/images/"))
+    .launch();
 }
