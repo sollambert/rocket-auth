@@ -1,4 +1,3 @@
-
 use rocket::get;
 use tokio_postgres::types::ToSql;
 use std::io::Error;
@@ -7,7 +6,6 @@ use std::io::ErrorKind;
 use crate::pool;
 
 pub mod auth;
-pub mod user;
 
 #[get("/")]
 pub async fn index() -> Result<String, Error> {

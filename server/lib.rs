@@ -9,12 +9,13 @@ use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
 use rocket::{fs::FileServer, Build};
 use rocket::{Rocket, Request, Response, Config};
-use routes::user;
+use routes::auth;
 
 //List all modules to import
 pub mod tests;
 pub mod routes;
 pub mod pool;
+pub mod models;
 
 pub struct CORS;
 
@@ -68,8 +69,8 @@ pub fn rocket_builder() -> Rocket<Build> {
         routes::echo
     ])
     .mount("/users", rocket::routes![
-        user::register_user,
-        user::login_user
+        auth::register_user,
+        auth::login_user
     ])
     .mount("/images", FileServer::from("public/images/"))
     .attach(CORS)
