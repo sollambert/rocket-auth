@@ -37,7 +37,7 @@ impl Fairing for CORS {
 
 fn get_env<'a>(env_var: &str) -> String {
     let env_var = &String::from_str(env_var).unwrap();
-    match env::vars().into_iter().find(
+    match env::vars().find(
     |(key, _)|
         key == env_var).ok_or(()) {
         Ok(result) => {
@@ -49,6 +49,7 @@ fn get_env<'a>(env_var: &str) -> String {
         }
     }
 }
+
 
 pub fn rocket_builder() -> Rocket<Build> {
     let secret_key = SecretKey::derive_from(
