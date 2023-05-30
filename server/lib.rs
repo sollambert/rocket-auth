@@ -46,7 +46,8 @@ pub fn rocket_builder() -> Rocket<Build> {
         routes::index,
         routes::echo,
         routes::image_server,
-        user::register_user]
+        user::register_user,
+        user::login_user]
     )
     .mount("/images", FileServer::from("public/images/"))
     .attach(CORS)
