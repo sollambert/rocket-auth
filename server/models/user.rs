@@ -1,11 +1,8 @@
-use core::fmt;
-use std::{io::Cursor, str::FromStr};
-use std::error::Error;
+use std::io::Cursor;
 use argon2::PasswordVerifier;
-use rocket::{post, serde::json::{Json, self}, response::Responder, Request, Response};
-use std::io::ErrorKind;
+use rocket::{serde::json, response::Responder, Request, Response};
 use serde_derive::{Deserialize, Serialize};
-use tokio_postgres::{types::ToSql, Row};
+use tokio_postgres:: Row;
 
 use argon2::{
     password_hash::{
