@@ -1,10 +1,6 @@
 
-use rocket::{
-    get,
-    fs::NamedFile
-};
+use rocket::get;
 use tokio_postgres::types::ToSql;
-use std::path::{Path, PathBuf};
 use std::io::Error;
 use std::io::ErrorKind;
 

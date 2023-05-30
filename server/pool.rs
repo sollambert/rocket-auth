@@ -7,16 +7,6 @@ fn get_connection_string() -> String {
     connection_string
 }
 
-// pub async fn send_queries(queries: Vec<(String, Vec<String>)>) -> Result<String, Error> {
-//     let mut response = "".to_string();
-//     let (client, connection) =
-//     tokio_postgres::connect(&get_connection_string(), NoTls).await.unwrap();
-//     queries.into_iter().for_each(|query| {
-
-//     });
-//     Ok("".to_string())
-// }
-
 pub async fn query(query: &str, params: Vec<&(dyn ToSql + Sync)>) -> Result<Vec<Row>, Error> {
     let client = get_client().await;
     let statement = client.prepare(query).await?;

@@ -53,6 +53,13 @@ pub struct User {
     pub hashed_password: String
 }
 
+#[derive(Debug)]
+enum LoginError {
+    InvalidData,
+    UsernameDoesNotExist,
+    WrongPassword
+}
+
 impl User {
     pub fn new(username: String, email: String, password: String) -> Self {
         let (hashed_password, _) = password_hasher(password.as_bytes());
