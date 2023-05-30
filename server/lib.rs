@@ -1,19 +1,65 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #![allow(unused_attributes)]
-use rocket::routes;
-use rocket_contrib::{serve::StaticFiles, helmet::SpaceHelmet};
+use std::net::Ipv4Addr;
+
+use rocket::fairing::{Fairing, Info, Kind};
+use rocket::http::Header;
+use rocket::{fs::FileServer, launch, Build};
+use rocket::{Rocket, Request, Response, Config};
+use routes::user;
 
 //List all modules to import
 pub mod tests;
 pub mod routes;
+pub mod pool;
 
-pub fn rocket_builder() -> rocket::Rocket {
-    rocket::ignite()
-    .attach(SpaceHelmet::default())
-    .mount("/", routes![
+pub struct CORS;
+
+#[rocket::async_trait]
+impl Fairing for CORS {
+    fn info(&self) -> Info {
+        Info {
+            name: "Add CORS headers to responses",
+            kind: Kind::Response
+        }
+    }
+
+    async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
+        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
+        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+    }
+}
+
+pub fn rocket_builder() -> Rocket<Build> {
+
+    let config = Config {
+        port: 8000,
+        address: Ipv4Addr::new(127,0,0,1).into(),
+        temp_dir: "/tmp".into(),
+        ..Config::default()
+    };
+
+    rocket::build()
+    .mount("/", rocket::routes![
         routes::index,
         routes::echo,
-        routes::image_server]
+        routes::image_server,
+        user::register_user]
     )
-    .mount("/images", StaticFiles::from("public/images/"))
+    .mount("/images", FileServer::from("public/images/"))
+    .attach(CORS)
+    .configure(config)
 }
+
+// #[launch]
+// pub fn rocket_builder_sync() -> Rocket<Build> {
+//     rocket::build()
+//     .mount("/", rocket::routes![
+//         routes::index,
+//         routes::echo,
+//         routes::image_server]
+//     )
+//     .mount("/images", FileServer::from("public/images/"))
+// }

@@ -19,7 +19,7 @@ module.exports = {
         open: true,
         proxy: {
             '/api': {
-                router: () => 'http://localhost:8000',
+                router: () => 'http://127.0.0.1:8000',
                 logLevel: 'debug' /*optional*/
             }
         }

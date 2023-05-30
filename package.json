@@ -1,7 +1,8 @@
 {
-  "name": "rusty-react",
+  "name": "rust-auth-demo",
   "version": "1.0.0",
   "description": "Template for personal rusty typescript react apps.",
+  "proxy": "http://127.0.0.1:8000",
   "main": "src/index.tsx",
   "scripts": {
     "dev": "webpack server --mode development",
