@@ -4,7 +4,7 @@ use std::net::Ipv4Addr;
 
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
-use rocket::{fs::FileServer, launch, Build};
+use rocket::{fs::FileServer, Build};
 use rocket::{Rocket, Request, Response, Config};
 use routes::user;
 
@@ -44,11 +44,12 @@ pub fn rocket_builder() -> Rocket<Build> {
     rocket::build()
     .mount("/", rocket::routes![
         routes::index,
-        routes::echo,
-        routes::image_server,
+        routes::echo
+    ])
+    .mount("/users", rocket::routes![
         user::register_user,
-        user::login_user]
-    )
+        user::login_user
+    ])
     .mount("/images", FileServer::from("public/images/"))
     .attach(CORS)
     .configure(config)

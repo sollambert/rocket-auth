@@ -53,7 +53,6 @@ pub struct User {
     pub hashed_password: String
 }
 
-
 impl User {
     pub fn new(username: String, email: String, password: String) -> Self {
         let (hashed_password, _) = password_hasher(password.as_bytes());
@@ -113,7 +112,7 @@ pub async fn register_user(user: Json<InsertableUser>) -> Result<User, Error> {
     params.push(&generated_user.hashed_password);
     match pool::execute("
     INSERT INTO users (username, email, password)
-    VALUES ($1, $2, $3)", &params).await {
+    VALUES ($1, $2, $3)", params).await {
         Ok(_) => {
             Ok(generated_user)
         }

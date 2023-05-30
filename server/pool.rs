@@ -24,7 +24,7 @@ pub async fn query(query: &str, params: Vec<&(dyn ToSql + Sync)>) -> Result<Vec<
     Ok(db_res)
 }
 
-pub async fn execute(query: &str, params: &[&(dyn ToSql + Sync)]) -> Result<u64, Error> {
+pub async fn execute(query: &str, params: Vec<&(dyn ToSql + Sync)>) -> Result<u64, Error> {
     let client = get_client().await;
     let statement = client.prepare(query).await?;
     let db_res = client.execute(&statement, &params[..]).await?;

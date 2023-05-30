@@ -38,8 +38,3 @@ pub async fn index() -> Result<String, Error> {
 pub fn echo<'r>(echo: String) -> Result<String, Error> {
     Ok(echo)
 }
-
-#[get("/images/<image..>")]
-pub async fn image_server<'a>(image: PathBuf) -> Result<NamedFile, Error> {
-    NamedFile::open(Path::new("public/images").join(image)).await
-}
