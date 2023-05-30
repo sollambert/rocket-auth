@@ -2,6 +2,7 @@
 #![allow(unused_attributes)]
 use std::env;
 use std::net::Ipv4Addr;
+use std::str::FromStr;
 
 use rocket::config::SecretKey;
 use rocket::fairing::{Fairing, Info, Kind};
@@ -34,14 +35,16 @@ impl Fairing for CORS {
     }
 }
 
-fn get_env<'a>(env_var: String) -> String {
+fn get_env<'a>(env_var: &str) -> String {
+    let env_var = &String::from_str(env_var).unwrap();
     match env::vars().into_iter().find(
-    |(key, _)| key == &env_var).ok_or(()) {
+    |(key, _)|
+        key == env_var).ok_or(()) {
         Ok(result) => {
             result.1
         },
         Err(_) => {
-            println!("ENV Var {} not found", env_var);
+            println!("ENV: {} not found", env_var);
             String::new()
         }
     }
@@ -49,7 +52,7 @@ fn get_env<'a>(env_var: String) -> String {
 
 pub fn rocket_builder() -> Rocket<Build> {
     let secret_key = SecretKey::derive_from(
-        get_env("SESSION_SECRET".to_string()).as_bytes());
+        get_env("SESSION_SECRET").as_bytes());
     let config = Config {
         port: 8000,
         address: Ipv4Addr::new(127,0,0,1).into(),

@@ -1,11 +1,8 @@
 use tokio_postgres::{NoTls, Error, Client, Row, types::ToSql};
-use std::env;
 
-fn get_connection_string() -> String {
-    let (_, connection_string) = env::vars().into_iter().find(
-        |(key, _)| key == "DB_CONNECTION_STRING").ok_or(()).unwrap();
-    connection_string
-}
+use crate::get_env;
+
+const DB_CONN: &str = "DB_CONNECTION_STRING";
 
 pub async fn query(query: &str, params: Vec<&(dyn ToSql + Sync)>) -> Result<Vec<Row>, Error> {
     let client = get_client().await;
@@ -23,7 +20,7 @@ pub async fn execute(query: &str, params: Vec<&(dyn ToSql + Sync)>) -> Result<u6
 
 async fn get_client() -> Client {
     let (client, connection) =
-    tokio_postgres::connect(&get_connection_string(), NoTls).await.unwrap();
+    tokio_postgres::connect(&get_env(DB_CONN), NoTls).await.unwrap();
     tokio::spawn(async move {
         if let Err(e) = connection.await {
             eprintln!("connection error: {}", e);
