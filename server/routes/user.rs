@@ -1,5 +1,6 @@
-use std::io::{Error, Cursor};
-
+use core::fmt;
+use std::{io::Cursor, str::FromStr};
+use std::error::Error;
 use rocket::{post, serde::json::{Json, self}, response::Responder, Request, Response};
 use std::io::ErrorKind;
 use serde_derive::{Deserialize, Serialize};
@@ -63,11 +64,36 @@ pub struct User {
     pub hashed_password: String
 }
 
-#[derive(Debug)]
-enum LoginError {
+#[derive(Serialize, Debug)]
+pub enum LoginError {
     InvalidData,
     UsernameDoesNotExist,
     WrongPassword
+}
+
+impl Error for LoginError {}
+
+impl fmt::Display for LoginError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::InvalidData => 
+                write!(f, "Invalid user data provided"),
+            Self::UsernameDoesNotExist => 
+                write!(f, "Provided username does not exist"),
+            Self::WrongPassword => 
+                write!(f, "Password provided is incorrect"),
+        }
+    }
+}
+
+impl<'r> Responder<'r, 'static> for LoginError {
+    fn respond_to(self, _: &'r Request<'_>) -> rocket::response::Result<'static> {
+        let serialized = json::serde_json::to_string_pretty(&self).unwrap();
+        Ok(Response::build()
+        .status(rocket::http::Status::Unauthorized)
+        .sized_body(serialized.len(), Cursor::new(serialized))
+        .finalize())
+    }
 }
 
 impl User {
@@ -111,7 +137,7 @@ pub fn password_hasher(password: &[u8]) -> (String, SaltString)  {
 }
 
 #[post("/register", format = "json", data = "<user>")]
-pub async fn register_user(user: Json<InsertableUser>) -> Result<ResponseUser, Error> {
+pub async fn register_user(user: Json<InsertableUser>) -> Result<ResponseUser, LoginError> {
     let generated_user = User::from_insertable(user.into_inner());
     let mut params: Vec<&(dyn ToSql + Sync)> = Vec::new();
     params.push(&generated_user.username);
@@ -123,14 +149,14 @@ pub async fn register_user(user: Json<InsertableUser>) -> Result<ResponseUser, E
         Ok(_) => {
             Ok(ResponseUser::new(generated_user))
         }
-        Err(err) => {
-            Err(Error::new(ErrorKind::InvalidData, err))
+        Err(_) => {
+            Err(LoginError::InvalidData)
         }
     }
 }
 
 #[post("/login", format = "json", data = "<user>")]
-pub async fn login_user(user: Json<LoginUser>) -> Result<ResponseUser, Error> {
+pub async fn login_user(user: Json<LoginUser>) -> Result<ResponseUser, LoginError> {
     let login_user = user.into_inner();
     let mut params: Vec<&(dyn ToSql + Sync)> = Vec::new();
     params.push(&login_user.username);
@@ -138,6 +164,9 @@ pub async fn login_user(user: Json<LoginUser>) -> Result<ResponseUser, Error> {
     SELECT * from users
     WHERE username = $1;", params).await {
         Ok(rows) => {
+            if rows.len() == 0 {
+                return Err(LoginError::UsernameDoesNotExist)
+            }
             for row in rows.iter() {
                 let user = User::from(row);
                 if user.validate_password(&login_user.password) {
@@ -145,10 +174,10 @@ pub async fn login_user(user: Json<LoginUser>) -> Result<ResponseUser, Error> {
                     return Ok(ResponseUser::new(user))
                 }
             }
-            Err(Error::new(ErrorKind::PermissionDenied, "Incorrect login details"))
+            Err(LoginError::WrongPassword)
         }
-        Err(err) => {
-            Err(Error::new(ErrorKind::InvalidData, err))
+        Err(_) => {
+            Err(LoginError::InvalidData)
         }
     }
 }
